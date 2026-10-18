@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naruto Ultimate Wallpaper PWA</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#FF4500">
+</head>
+<body>
+    <!-- Screen Flash Intro -->
+    <div id="flash-screen">
+        <div class="flash-logo">⚡ HIDEO: UZUMAKI MODE ⚡</div>
+    </div>
+
+    <header class="app-header">
+        <h1>Dattebayo Wallpapers 🍥</h1>
+        <button id="theme-toggle" class="luxury-btn">🌓 Mode</button>
+    </header>
+
+    <main class="gallery-grid" id="wallpaper-container">
+        <!-- Dynamic Content from JSON -->
+    </main>
+
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('./sw.js')
+                .then(() => console.log('SW Registered!'))
+                .catch(err => console.log('SW Failed:', err));
+        }
+
+        // Screen Flash Handler
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const flash = document.getElementById('flash-screen');
+                flash.style.opacity = '0';
+                setTimeout(() => flash.remove(), 500);
+            }, 800);
+        });
+
+        // Load JSON & Render
+        fetch('./wallpapers.json')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('wallpaper-container');
+                data.forEach(item => {
+                    container.innerHTML += `
+                        <div class="card">
+                            <img src="${item.url}" alt="${item.title}" loading="lazy">
+                            <div class="card-footer">
+                                <h3>${item.title}</h3>
+                                <a href="${item.url}" download class="download-btn">📥 Download</a>
+                            </div>
+                        </div>
+                    `;
+                });
+            });
+
+        // Theme Toggle
+        const toggleBtn = document.getElementById('theme-toggle');
+        const htmlTag = document.documentElement;
+        toggleBtn.addEventListener('click', () => {
+            const currentTheme = htmlTag.getAttribute('data-theme');
+            htmlTag.setAttribute('data-theme', currentTheme === 'dark' ? 'light' : 'dark');
+        });
+    </script>
+</body>
+</html>
